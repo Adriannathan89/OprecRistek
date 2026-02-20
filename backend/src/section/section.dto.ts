@@ -4,9 +4,6 @@ export class SectionDto {
     @IsString()
     formId: string;
 
-    @IsString()
-    userId: string;
-
     description?: string;
 
     title?: string;

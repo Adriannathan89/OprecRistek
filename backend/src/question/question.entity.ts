@@ -12,7 +12,7 @@ export class Question {
     @Column({nullable: true})
     description: string;
 
-    @Column()
+    @Column({type: "varchar", default: "multiple-choice"})
     questionType: string;
 
     @Column({type: "boolean", default: false})
