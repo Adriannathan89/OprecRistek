@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Put, Body } from "@nestjs/common";
+import { Controller, Get, Param, Post, Put, Body, Delete } from "@nestjs/common";
 import { SectionService } from "./section.service";
 
 @Controller("/api/section")
@@ -20,5 +20,10 @@ export class SectionController {
     @Put("/:id")
     async updateSection(@Param("id") id: string, @Body() sectionDto) {
         return await this.sectionService.updateSection(id, sectionDto);
+    }
+
+    @Delete("/:id")
+    async deleteSection(@Param("id") id: string) {
+        return await this.sectionService.deleteSection(id);
     }
 }

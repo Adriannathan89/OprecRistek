@@ -1,13 +1,9 @@
 import { IsString } from "class-validator";
 
-export class SectionDto {
+export class UserTakingFormDto {
     @IsString()
     formId: string;
 
     @IsString()
     userId: string;
-
-    description?: string;
-
-    title?: string;
 }

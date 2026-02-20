@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { UserTakingForm } from 'src/user-taking-form/user-taking-form.entity';
+import { Section } from 'src/section/section.entity';
 
 @Entity()
 export class UserAnswer {
@@ -13,10 +14,14 @@ export class UserAnswer {
     questionId: string;
 
     @Column({type: "json", nullable: true})
-    userAnswer: string;
+    userAnswer: string | string[] | number | boolean;
 
     @Column({name : "user_taking_form_id"})
     userTakingFormId: string;
+
+    @ManyToOne(() => Section, section => section.userAnswers, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: "section_id" })
+    section: Section;
 
     @ManyToOne(() => UserTakingForm, userTakingForm => userTakingForm.userAnswers, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "user_taking_form_id" })

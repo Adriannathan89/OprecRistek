@@ -1,7 +1,7 @@
 export class Answer {
     id: string;
 
-    description: string;
+    description: string | string[] | number | boolean;
 
     answerCount: number = 0;
 

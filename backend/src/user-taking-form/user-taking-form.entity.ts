@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Form } from '../form/form.entity';
-import { UserAnswer } from 'src/user-answer/user-aswer.entity';
+import { UserAnswer } from 'src/user-answer/user-answer.entity';
 
 @Entity()
 export class UserTakingForm {

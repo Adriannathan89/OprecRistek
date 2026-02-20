@@ -1,33 +1,39 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from "@nestjs/common";
 import { FormService } from "./form.service";
+import { JwtAuthGuard } from "src/auth-guard/jwt-auth.guard";
 
 @Controller("/api/form")
 export class FormController {
     constructor(private formService: FormService) {}
 
+    @UseGuards(JwtAuthGuard)
     @Post("/")
-    async createForm(@Body() formDto) {
-        return await this.formService.createForm(formDto);
+    async createForm(@Body() formDto, @Request() req) {
+        return await this.formService.createForm(formDto, req.user);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get("/user")
+    async getAllForms(@Request() req) {
+        return await this.formService.getAllForms(req.user);
+    }
+    
+    @UseGuards(JwtAuthGuard)
     @Get("/:id")
-    async getFormById(@Param("id") id: string) {
-        return await this.formService.getFormById(id);
+    async getFormById(@Param("id") id: string, @Request() req) {
+        return await this.formService.getFormById(id, req.user);
     }
 
-    @Get("/user/:userId")
-    async getAllForms(@Param("userId") userId: string) {
-        return await this.formService.getAllForms(userId);
-    }
-
+    @UseGuards(JwtAuthGuard)
     @Put("/:id")
-    async updateForm(@Param("id") id: string, @Body() formDto) {
-        return await this.formService.updateForm(id, formDto);
+    async updateForm(@Param("id") id: string, @Body() formDto, @Request() req) {
+        return await this.formService.updateForm(id, formDto, req.user);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete("/:id")
-    async deleteForm(@Param("id") id: string) {
-        return await this.formService.deleteForm(id);
+    async deleteForm(@Param("id") id: string, @Request() req) {
+        return await this.formService.deleteForm(id, req.user);
     }
 
 }
