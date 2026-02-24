@@ -6,7 +6,7 @@ export default function Header({isLogin}: {isLogin: boolean}) {
     const navigate = useNavigate()
 
     return(
-        <div className="flex justify-between mb-[20px] border-b-2 border-gray-300 py-4">
+        <div className="flex justify-between border-b-2 border-gray-300 py-4">
             <div className="flex items-center text-2xl font-semibold ml-6">Ristek Form</div>
             <div className="mr-6">
                 {isLogin ? (

@@ -21,7 +21,6 @@ export function useAuthService() {
     }
 
     const signUp = async (registerInfo: LoginInfo) => {
-        console.log(import.meta.env.VITE_USER_REGISTER);
         try {
             await register(registerInfo);
             navigate("/auth");

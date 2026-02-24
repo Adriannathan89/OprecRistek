@@ -8,7 +8,6 @@ import { useAuthService } from "./useAuthService";
 export default function AuthPages() {
     const [isLogin, setIsLogin] = useState(true);
     const { signIn, signUp, onChange, user } = useAuthService();
-    console.log(user);
     
     return(
         <>

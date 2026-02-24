@@ -24,7 +24,6 @@ export async function login(loginInfo: LoginInfo) {
 }
 
 export async function register(registerInfo: LoginInfo) {
-    console.log(import.meta.env.VITE_USER_REGISTER);
     const res = await fetch(import.meta.env.VITE_USER_REGISTER, {
         method: "POST",
         headers: {
