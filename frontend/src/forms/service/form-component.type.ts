@@ -12,17 +12,21 @@ export type Answer = {
 
 export type Question = {
     id: string,
+    sectionId: string,
+    required: boolean,
     description: string,
     questionType: string,
+    position: number,
     options?: Option[]
-    answer?: Answer[]
+    answers?: Answer[]
 }
 
 export type Section = {
     id: string,
     title: string,
     description: string,
-    Questions?: Question[]
+    position: number,
+    questions?: Question[]
 }
 
 export type Form = {
@@ -33,5 +37,5 @@ export type Form = {
     isPublished: boolean,
     isAnswered: boolean,
     createdById: string,
-    Sections?: Section[]
+    sections: Section[]
 }
