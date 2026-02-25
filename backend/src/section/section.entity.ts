@@ -18,6 +18,9 @@ export class Section {
     @Column({name : "form_id"})
     formId: string;
 
+    @Column()
+    position: number;
+
     @Column({name: "user_id"})
     userId: string;
 

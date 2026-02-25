@@ -8,8 +8,11 @@ export class Form {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({nullable: true})
+    @Column({type: "text", nullable: true})
     title: string;
+
+    @Column({type: "text", nullable: true})
+    description: string;
 
     @Column({type: "boolean", default: false})
     isQuiz: boolean;

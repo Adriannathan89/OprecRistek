@@ -3,11 +3,13 @@ import { QuestionService } from "./question.service";
 import { JwtAuthGuard } from "src/auth-guard/jwt-auth.guard";
 import { QuestionDto } from "./question.dto";
 import { Request } from "@nestjs/common";
+import { QuestionManagerService } from "./question-manager.service";
 
 @Controller("/api/question")
 export class QuestionController {
     constructor(
-        private readonly questionService: QuestionService
+        private readonly questionService: QuestionService,
+        private readonly questionManagerService: QuestionManagerService
     ) {}
 
     @UseGuards(JwtAuthGuard)
@@ -15,6 +17,12 @@ export class QuestionController {
     async createQuestion(@Body() questionDto: QuestionDto, @Request() req) {
         return await this.questionService.createQuestion(questionDto, req.user);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post("/balancing/:sectionId")
+    async balancingPosition(@Param("sectionId") sectionId: string) {
+        return await this.questionManagerService.rebalancePosition(sectionId);
+     }  
 
     @UseGuards(JwtAuthGuard)
     @Put("/:id")

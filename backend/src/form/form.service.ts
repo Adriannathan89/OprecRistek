@@ -5,6 +5,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FormDto } from "./form.dto";
 import { ApiResponse } from "src/apiResponse/api.response";
 import { User } from "src/user/user.entity";
+import { ServerErrorResponse } from "src/apiResponse/errorResponse/serverError.response";
+import { UnAuthResponse } from "src/apiResponse/errorResponse/unAuth.response";
+import { NotFoundResponse } from "src/apiResponse/errorResponse/notFound.response";
 
 @Injectable()
 export class FormService {
@@ -13,32 +16,38 @@ export class FormService {
     ) { }
 
     async createForm(formDto: FormDto, user: any) {
-        const formData = new Form();
-        Object.assign(formData, formDto);
-        formData.createdById = user.sub;
+        try {
+            const formData = new Form();
+            Object.assign(formData, formDto);
+            formData.createdById = user.sub;
 
-        const form: Form = await this.formRepository.save(formData);
-        if (!form) {
-            const apiReponse = new ApiResponse<Form>(false, 500, "Failed to create form");
+            const form: Form = await this.formRepository.save(formData);
+            const apiReponse = new ApiResponse<Form>(true, 201, "Form created successfully", form);
             return apiReponse;
+        } catch (error) {
+            throw new ServerErrorResponse("Failed to create form");
         }
-        const apiReponse = new ApiResponse<Form>(true, 201, "Form created successfully", form);
-        return apiReponse;
     }
 
     async getFormById(id: string, user: any) {
         const form = await this.formRepository.findOne({
             where: { id },
-            relations: ["sections", "sections.questions"]
+            relations: ["sections", "sections.questions"],
+            order: {
+                sections: {
+                    position: "ASC",
+                    questions: {
+                        position: "ASC"
+                    }
+                }
+            }
         });
         if (!form) {
-            const apiReponse = new ApiResponse<Form>(false, 404, "Form not found");
-            return apiReponse;
+            throw new NotFoundResponse("Form not found");
         }
 
         if (form.createdById !== user.sub) {
-            const apiReponse = new ApiResponse<Form>(false, 403, "You do not have permission to access this form");
-            return apiReponse;
+            throw new UnAuthResponse(403, "You do not have permission to access this form");
         }
 
         const apiReponse = new ApiResponse<Form>(true, 200, "Form found", form);
@@ -46,39 +55,32 @@ export class FormService {
     }
 
     async getAllForms(user: any) {
-        try {
-            const forms = await this.formRepository.find(
-                {where: { createdById: user.sub }}
-            );
-            if (!forms || forms.length === 0) {
-                const apiReponse = new ApiResponse<Form[]>(false, 404, "No forms found for this user");
-                return apiReponse;
-            }
-
-            const apiReponse = new ApiResponse<Form[]>(true, 200, "Forms retrieved successfully", forms);
-            return apiReponse;
-        } catch (error) {
-            const apiReponse = new ApiResponse<Form[]>(false, 500, "Failed to retrieve forms");
-            return apiReponse;
+        const forms = await this.formRepository.find({
+            where: { createdById: user.sub },
+            order: { updatedAt: "DESC" },
         }
+        );
+        if (!forms || forms.length === 0) {
+            throw new NotFoundResponse("No forms found for this user");
+        }
+
+        const apiReponse = new ApiResponse<Form[]>(true, 200, "Forms retrieved successfully", forms);
+        return apiReponse;
     }
 
     async deleteForm(id: string, user: any) {
         const form = await this.formRepository.findOneBy({ id });
         if (!form) {
-            const apiReponse = new ApiResponse<Form>(false, 404, "Form not found");
-            return apiReponse;
+            throw new NotFoundResponse("Form not found");
         }
 
         if (form.createdById !== user.sub) {
-            const apiReponse = new ApiResponse<Form>(false, 403, "You do not have permission to delete this form");
-            return apiReponse;
+            throw new UnAuthResponse(403, "You do not have permission to delete this form");
         }
 
         const result = await this.formRepository.delete(id);
         if (result.affected === 0) {
-            const apiReponse = new ApiResponse<Form>(false, 500, "Failed to delete form");
-            return apiReponse;
+            throw new ServerErrorResponse("Failed to delete form");
         }
         const apiReponse = new ApiResponse<Form>(true, 200, "Form deleted successfully");
         return apiReponse;
@@ -88,19 +90,17 @@ export class FormService {
         const form = await this.formRepository.findOneBy({ id });
 
         if (!form) {
-            const apiReponse = new ApiResponse<Form>(false, 404, "Form not found");
-            return apiReponse;
+            throw new NotFoundResponse("Form not found");
         }
 
         if (form.createdById !== user.sub) {
-            const apiReponse = new ApiResponse<Form>(false, 403, "You do not have permission to update this form");
-            return apiReponse;
+            throw new UnAuthResponse(403, "You do not have permission to update this form");
         }
 
         if (form.isAnswered) {
-            const apiReponse = new ApiResponse<Form>(false, 400, "Cannot update form that has been answered");
-            return apiReponse;
+            throw new UnAuthResponse(400, "You cannot update a form that has been answered");
         }
+
         Object.assign(form, formDto);
 
         const updatedForm = await this.formRepository.save(form);

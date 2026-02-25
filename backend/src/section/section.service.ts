@@ -78,47 +78,4 @@ export class SectionService {
         const apiResponse = new ApiResponse<Section>(true, 200, "Section deleted successfully");
         return apiResponse;
     }
-
-    async getSectionByFormId(formId: string, user: any) {
-        const sections = await this.sectionRepository.find({ 
-            where: { formId },
-            relations: ["questions"]
-        });
-
-        if(!await this.validateFormPublicationStatus(formId) && !await this.validateSectionOwnership(sections[0].id, user.sub)) {
-            const apiResponse = new ApiResponse<Section[]>(false, 403, "You do not have permission to view sections for this form");
-            return apiResponse;
-        }
-
-        if (!sections || sections.length === 0) {
-            const apiResponse = new ApiResponse<Section[]>(false, 404, "No sections found for this form");
-            return apiResponse;
-        }
-
-        if(await this.validateFormPublicationStatus(formId) && !await this.validateSectionOwnership(sections[0].id, user.sub)) {
-            const sectionResponses = sections.map(section => {
-                const sectionResponse = new SectionResponderResponse();
-                sectionResponse.id = section.id;
-                sectionResponse.title = section.title;
-                sectionResponse.description = section.description;
-                sectionResponse.formId = section.formId;
-                sectionResponse.questions = section.questions.map(question => {
-                    const questionResponse = new QuestionRespondenResponse();
-                    questionResponse.id = question.id;
-                    questionResponse.description = question.description;
-                    questionResponse.questionType = question.questionType;
-                    questionResponse.required = question.required;
-                    questionResponse.options = question.options;
-                    return questionResponse;
-                });
-                return sectionResponse;
-            });
-
-            const apiResponse = new ApiResponse<SectionResponderResponse[]>(true, 200, "Sections retrieved successfully", sectionResponses);
-            return apiResponse;
-        }
-
-        const apiResponse = new ApiResponse<Section[]>(true, 200, "Sections retrieved successfully", sections);
-        return apiResponse;
-    }
 }

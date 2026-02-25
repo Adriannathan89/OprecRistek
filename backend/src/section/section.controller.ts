@@ -2,12 +2,15 @@ import { Controller, Get, Param, Post, Put, Body, Delete, UseGuards } from "@nes
 import { SectionService } from "./section.service";
 import { JwtAuthGuard } from "src/auth-guard/jwt-auth.guard";
 import { Request } from "@nestjs/common";
+import { SectionManagerService } from "./section-manager.service";
 
 @Controller("/api/section")
 export class SectionController {
     constructor(
-        private readonly sectionService: SectionService
+        private readonly sectionService: SectionService,
+        private readonly sectionManagerService: SectionManagerService
     ) {}
+
 
     @UseGuards(JwtAuthGuard)
     @Post("/")
@@ -16,9 +19,9 @@ export class SectionController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get("/:formId")
-    async getSectionByFormId(@Param("formId") formId: string, @Request() req) {
-        return await this.sectionService.getSectionByFormId(formId, req.user);
+    @Post("/balancing/:formId")
+    async balancingPosition(@Param("formId") formId: string) {
+        return await this.sectionManagerService.rebalancePosition(formId);
     }
 
     @UseGuards(JwtAuthGuard)

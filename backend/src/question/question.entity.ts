@@ -18,6 +18,9 @@ export class Question {
     @Column({type: "boolean", default: false})
     required: boolean;
 
+    @Column()
+    position: number;
+
     @Column({name : "section_id"})
     sectionId: string;
 
