@@ -74,3 +74,13 @@ export async function deleteQuestion(questionId: string) {
         throw new AppError(json.message, json.statusCode);
     }
 }
+
+export async function rebalanceQuestion(sectionId: string) {
+    const res = await fetch(`${import.meta.env.VITE_QUESTION_REBALANCE_ENDPOINT}/${sectionId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+    });
+}

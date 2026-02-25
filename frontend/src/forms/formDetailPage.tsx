@@ -1,14 +1,30 @@
-import { useEffect, useRef } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import FormHeader from "../components/common/formHeader";
 import { Textarea } from "../components/ui/textarea";
 import { useDetailFormService, useFormAutoSave } from "./hooks/useDetailFormService";
+import FormNavbar from "../components/common/formNavbar";
+import type { QuestionActiveComponent, SectionActiveComponent } from "./service/form-component.type";
 
 export default function FormDetailPage() {
     const formId = window.location.pathname.split("/form/")[1];
-    const { form, onChange, isLoading, error } = useDetailFormService(formId);
-    const { sync } = useFormAutoSave(form!);
+    const [sync, setSync] = useState(false);
+
+    const [questionActive, setQuestionActive] = useState<QuestionActiveComponent>({} as QuestionActiveComponent);
+    const [sectionActive, setSectionActive] = useState<SectionActiveComponent>({} as SectionActiveComponent);
+        const { form, onChange, onSectionChange, onQuestionChange, onAddAfterQuestion, onAddAfterSection, isLoading, error } = 
+        useDetailFormService(formId, setQuestionActive, setSectionActive);
+
     const formTitleref = useRef<HTMLTextAreaElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        if(form.sections && form.sections.length > 0) {
+        setQuestionActive({ questionIndex: 0, sectionId: form.sections[0].id });
+        setSectionActive({ sectionIndex: 0 });
+        }
+    }, [form])
+
+    useFormAutoSave(form, setSync);
 
     const resize = (ref: HTMLTextAreaElement | null) => {
         const el = ref;
@@ -73,6 +89,8 @@ export default function FormDetailPage() {
                     </div>
                 </div>
 
+                <FormNavbar onAddQuestion={() => onAddAfterQuestion(questionActive.sectionId, questionActive.questionIndex)} 
+                onAddSection={() => onAddAfterSection(sectionActive.sectionIndex)} />
             </div>
         </>
     )

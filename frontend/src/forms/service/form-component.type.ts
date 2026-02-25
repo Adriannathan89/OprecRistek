@@ -39,3 +39,12 @@ export type Form = {
     createdById: string,
     sections: Section[]
 }
+
+export type SectionActiveComponent = {
+    sectionIndex: number,
+}
+
+export type QuestionActiveComponent = {
+    questionIndex: number,
+    sectionId: string,
+}
