@@ -78,4 +78,41 @@ export class SectionService {
         const apiResponse = new ApiResponse<Section>(true, 200, "Section deleted successfully");
         return apiResponse;
     }
+
+    async getSectionForResponder(id: string) {
+        if(!await this.validateFormPublicationStatus(id)) {
+            const apiResponse = new ApiResponse<Section>(false, 403, "This form is not published yet");
+            return apiResponse;
+        }
+        
+        const section = await this.sectionRepository.findOne({
+            where: { id },
+            relations: ["questions"],
+            order: {
+                questions: {
+                    position: "ASC"
+                }
+            }
+        });
+
+        if (!section) {
+            const apiResponse = new ApiResponse<Section>(false, 404, "Section not found");
+            return apiResponse;
+        }
+        const sectionResponse = new SectionResponderResponse();
+        sectionResponse.id = section.id;
+        sectionResponse.title = section.title;
+        sectionResponse.description = section.description;
+        sectionResponse.questions = section.questions.map(question => {
+            const questionResponse = new QuestionRespondenResponse();
+            questionResponse.id = question.id;
+            questionResponse.questionType = question.questionType;
+            questionResponse.description = question.description;
+            questionResponse.options = question.options;
+            return questionResponse;
+        });
+
+        const apiResponse = new ApiResponse<SectionResponderResponse>(true, 200, "Section found", sectionResponse);
+        return apiResponse;
+    }
 }

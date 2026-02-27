@@ -19,6 +19,12 @@ export class SectionController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get("/responder/:id")
+    async getSectionForResponder(@Param("id") id: string) {
+        return await this.sectionService.getSectionForResponder(id);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post("/balancing/:formId")
     async balancingPosition(@Param("formId") formId: string) {
         return await this.sectionManagerService.rebalancePosition(formId);

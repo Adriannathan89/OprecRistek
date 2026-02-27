@@ -4,10 +4,10 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FormDto } from "./form.dto";
 import { ApiResponse } from "src/apiResponse/api.response";
-import { User } from "src/user/user.entity";
 import { ServerErrorResponse } from "src/apiResponse/errorResponse/serverError.response";
 import { UnAuthResponse } from "src/apiResponse/errorResponse/unAuth.response";
 import { NotFoundResponse } from "src/apiResponse/errorResponse/notFound.response";
+import { FormResponderResponse } from "./form-responder.response";
 
 @Injectable()
 export class FormService {
@@ -105,6 +105,33 @@ export class FormService {
 
         const updatedForm = await this.formRepository.save(form);
         const apiReponse = new ApiResponse<Form>(true, 200, "Form updated successfully", updatedForm);
+        return apiReponse;
+    }
+
+    async ReponderGetFormById(id: string) {
+        const form = await this.formRepository.findOne({
+            where: { id },
+            relations: ["sections"],
+            order: {
+                sections: {
+                    position: "ASC"
+                }
+            }
+        });
+        if (!form) {
+            throw new NotFoundResponse("Form not found");
+        }
+
+        if(!form.isPublished) {
+            throw new UnAuthResponse(403, "This form is not published yet");
+        }
+        
+        const newResponse = new FormResponderResponse();
+        newResponse.id = form.id;
+        newResponse.title = form.title;
+        newResponse.isQuiz = form.isQuiz;
+        newResponse.sectionsId = form.sections.map(section => section.id);
+        const apiReponse = new ApiResponse<FormResponderResponse>(true, 200, "Form found", newResponse);
         return apiReponse;
     }
 }

@@ -9,11 +9,6 @@ export class UserAnswerController {
         private readonly userAnswerService: UserAnswerService
     ) {}
 
-    @Post("/")
-    async createUserAnswer(@Body() userAnswerDto: UserAnswerDto) { 
-        return await this.userAnswerService.createUserAnswer(userAnswerDto);
-    }
-
     @Put("/:id")
     async updateUserAnswer(@Body() userAnswerDto: UserAnswerDto, @Param("id") id: string) {
         return await this.userAnswerService.updateUserAnswer(id, userAnswerDto);

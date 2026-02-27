@@ -12,20 +12,6 @@ export class UserAnswerService {
         @InjectRepository(UserAnswer) private readonly userAnswerRepository: Repository<UserAnswer>,
     ) { }
 
-    async createUserAnswer(userAnswerDto: UserAnswerDto) {
-        try {
-            const userAnswer = new UserAnswer();
-            Object.assign(userAnswer, userAnswerDto);
-            const savedUserAnswer = await this.userAnswerRepository.save(userAnswer);
-
-            const apiRespose = new ApiResponse<UserAnswer>(true, 201, "User answer created successfully", savedUserAnswer);
-            return apiRespose;
-        } catch (error) {
-            const apiRespose = new ApiResponse<UserAnswer>(false, 500, "Failed to create user answer");
-            return apiRespose;
-        }
-    }
-
     async updateUserAnswer(id: string, userAnswerDto: UserAnswerDto) {
         try {
             const userAnswer = await this.userAnswerRepository.findOne({ where: { id } });

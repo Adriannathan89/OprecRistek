@@ -17,6 +17,12 @@ export class FormController {
     async getAllForms(@Request() req) {
         return await this.formService.getAllForms(req.user);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Get("/responder/:id")
+    async getFormForResponder(@Param("id") id: string) {
+        return await this.formService.ReponderGetFormById(id);
+    }
     
     @UseGuards(JwtAuthGuard)
     @Get("/:id")

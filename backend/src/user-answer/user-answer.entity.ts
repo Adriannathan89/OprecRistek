@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { UserTakingForm } from 'src/user-taking-form/user-taking-form.entity';
 import { Section } from 'src/section/section.entity';
+import { Question } from 'src/question/question.entity';
 
 @Entity()
 export class UserAnswer {
@@ -26,4 +27,8 @@ export class UserAnswer {
     @ManyToOne(() => UserTakingForm, userTakingForm => userTakingForm.userAnswers, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "user_taking_form_id" })
     userTakingForm: UserTakingForm;
+
+    @OneToOne(() => Question, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: "question_id" })
+    question: Question;
 }
