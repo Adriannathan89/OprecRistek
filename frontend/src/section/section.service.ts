@@ -68,7 +68,7 @@ export async function createSection(formId: string, position: number) {
 }
 
 export async function rebalanceSection(formId: string) {
-    const res = await fetch(`${import.meta.env.VITE_SECTION_REBALANCE_ENDPOINT}/${formId}`, {
+    await fetch(`${import.meta.env.VITE_SECTION_REBALANCE_ENDPOINT}/${formId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

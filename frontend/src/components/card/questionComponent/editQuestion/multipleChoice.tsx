@@ -1,14 +1,14 @@
-import type { Answer, Option, Question } from "../../../forms/service/form-component.type";
-import UseEditQuestionProps from "../../../question/useEditQuestionProps";
+import type { Answer, Option, Question } from "../../../../forms/service/form-component.type";
+import UseEditQuestionProps from "../../../../question/useEditQuestionProps";
 
 
-export default function MultipleChoice({question, isActive, onChange} : {question: Question, isActive: boolean, onChange: (question: Question) => void}) {
+export default function MultipleChoiceAnswer({question, isActive, onChange} : {question: Question, isActive: boolean, onChange: (question: Question) => void}) {
     const options: Option[] = question.options || [];
     const answers: Answer[] = question.answers || [];
     const { updateOptionAndAnswer, addNew, deleteOptions } = UseEditQuestionProps(question, onChange);
 
     return (
-        <div className="flex flex-col gap-2 mt-[16px] mb-[20px]">
+        <div className="flex flex-col gap-2 mt-[16px] mb-[20px] ">
             {options.map((option) => (
                 <div key={option.id} className="flex gap-2">
                     <div className="relative w-full flex gap-[12px]">
@@ -20,10 +20,10 @@ export default function MultipleChoice({question, isActive, onChange} : {questio
                             updateOptionAndAnswer(options, answers, option.id, e.target.value)
                         }}
                         className="p-2 border-b-2 border-gray-200 w-[600px] focus:outline-none outline-none peer
-                        text-gray-600"
+                        text-gray-600 "
                     />
                     <span
-                    className="w-[600px] pointer-events-none absolute bottom-[0px] left-9 h-0.5 w-full bg-[#6775f0] scale-x-0 origin-center
+                    className="w-[599px] pointer-events-none absolute bottom-[0px] left-9 h-0.5 w-full bg-[#6775f0] scale-x-0 origin-center
                         transition-all duration-300 ease-out peer-focus:scale-x-100" />
                     {isActive &&
                     <button className="absolute bottom-2 right-5 text-xl text-gray-400" 

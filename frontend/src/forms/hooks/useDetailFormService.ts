@@ -38,7 +38,6 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
         if (sectionRebalanceActivation) {
             rebalanceSection(form.id)
         }
-
         setForm((prevForm) => {
             const newSection: Section = {
                 id: newSectionId,

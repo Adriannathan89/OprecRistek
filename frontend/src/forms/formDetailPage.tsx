@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FormHeader from "../components/common/formHeader";
 import { Textarea } from "../components/ui/textarea";
 import { useDetailFormService, useFormAutoSave } from "./hooks/useDetailFormService";
@@ -23,6 +23,9 @@ export default function FormDetailPage() {
         if (form.sections && form.sections.length > 0) {
             setQuestionActive({ questionIndex: -1, sectionId: form.sections[0].id });
             setSectionActive({ sectionIndex: 0 });
+        }
+        if(form.sections && form.sections.length === 0) {
+            setSectionActive({ sectionIndex: -1 });
         }
     }, [form.id])
 
@@ -101,6 +104,7 @@ export default function FormDetailPage() {
                                 sectionActiveComponent={sectionActive}
                                 questionActive={questionActive}
                                 indexSection={index}
+                                totalSection={form.sections ? form.sections.length : 0}
                                 onQuestionDelete={onDeleteCurrentQuestion}
                                 onSectionDelete={onDeleteCurrentSection}
                                 onQuestionChange={onQuestionChange}
@@ -120,7 +124,7 @@ export default function FormDetailPage() {
                     setQuestionActive({sectionId: questionActive.sectionId, questionIndex: questionActive.questionIndex + 1})
                 }}
                     onAddSection={() => {
-                        onAddAfterSection(sectionActive.sectionIndex)
+                        onAddAfterSection( sectionActive.sectionIndex )
                         setSectionActive({ sectionIndex: sectionActive.sectionIndex + 1})
                         setQuestionActive({...questionActive, questionIndex: -1})
                     }} />

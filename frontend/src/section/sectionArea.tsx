@@ -3,6 +3,7 @@ import { Textarea } from "../components/ui/textarea";
 import { useEffect, useRef } from "react";
 import { useSectionAutoSave } from "./useSectionAutoSave";
 import QuestionArea from "../question/questionArea";
+import { Trash } from "lucide-react";
 
 
 interface SetionAreaProps {
@@ -10,6 +11,7 @@ interface SetionAreaProps {
     sectionActiveComponent: SectionActiveComponent;
     questionActive: QuestionActiveComponent;
     indexSection: number;
+    totalSection: number;
     setQuestionActive: React.Dispatch<React.SetStateAction<QuestionActiveComponent>>;
     onChange: (section: Section) => void;
     onQuestionChange: (question: Question) => void;
@@ -20,7 +22,7 @@ interface SetionAreaProps {
     setSectionActive: React.Dispatch<React.SetStateAction<SectionActiveComponent>>;
 }
 
-export default function SectionArea({ section, sectionActiveComponent, questionActive, indexSection, setQuestionActive, onChange, onQuestionChange, 
+export default function SectionArea({ section, sectionActiveComponent, questionActive, indexSection, totalSection, setQuestionActive, onChange, onQuestionChange,
     onClick, setSync, onSectionDelete, onQuestionDelete, setSectionActive }: SetionAreaProps) {
 
     const sectionTitleref = useRef<HTMLTextAreaElement>(null);
@@ -35,24 +37,24 @@ export default function SectionArea({ section, sectionActiveComponent, questionA
 
     const resize = (ref: HTMLTextAreaElement | null) => {
         const el = ref;
-        if(!el) return;
+        if (!el) return;
 
-        if(!el.value) {
+        if (!el.value) {
             el.style.height = "auto";
             el.style.height = ref === sectionTitleref.current ? "52px" : "30px";
             return
-        } 
+        }
 
         el.style.height = "auto";
-        el.style.height =  (el.scrollHeight-10) + "px";
+        el.style.height = (el.scrollHeight - 10) + "px";
     }
     useSectionAutoSave(section, setSync);
 
     return (
         <>
-            <div 
-            onClick={onClick}
-            className="w-full min-h-[200px] h-auto mt-[10px]">
+            <div
+                onClick={onClick}
+                className="w-full min-h-[200px] h-auto mt-[10px]">
                 <div className="w-full min-h-[200px] h-auto border-1 border-gray-200 shadow-md bg-white rounded-b-md p-4 m-4 
                         border-t-[7px] border-blue-500">
                     <div className="relative w-full">
@@ -80,26 +82,32 @@ export default function SectionArea({ section, sectionActiveComponent, questionA
                             className="pointer-events-none absolute bottom-[5px] left-0 h-0.5 w-full bg-[#6775f0] scale-x-0 origin-center
                                     transition-all duration-300 ease-out peer-focus:scale-x-100" />
                     </div>
+
+                    <div>
+                        {(sectionActiveComponent.sectionIndex === indexSection && totalSection > 1) &&
+                            <div className="flex justify-end w-full gap-2 mt-[12px] pr-[32px]">
+                                <button onClick={() => onSectionDelete(section.id)}><Trash size={20} /></button>
+                            </div>}
+                    </div>
                 </div>
             </div>
-            
+
             {
                 section.questions && section.questions.map((question, index) => (
-                    <QuestionArea 
-                    onQuestionDelete={() => onQuestionDelete(section.id, question.id, section.questions ? section.questions.length : 0, index)}
-                    key={index} 
-                    question={question} 
-                    isActive={questionActive.questionIndex === index && questionActive.sectionId === section.id}
-                    onClick={() => {
-                        setQuestionActive({sectionId: section.id, questionIndex: index})
-                        setSectionActive({sectionIndex: indexSection})
-                    }} 
-                        
-                    setSync={setSync} 
-                    onQuestionChange={onQuestionChange}
+                    <QuestionArea
+                        onQuestionDelete={() => onQuestionDelete(section.id, question.id, section.questions ? section.questions.length : 0, index)}
+                        key={index}
+                        question={question}
+                        isActive={questionActive.questionIndex === index && questionActive.sectionId === section.id}
+                        onClick={() => {
+                            setQuestionActive({ sectionId: section.id, questionIndex: index })
+                            setSectionActive({ sectionIndex: indexSection })
+                        }}
+
+                        setSync={setSync}
+                        onQuestionChange={onQuestionChange}
                     />
                 ))
-
             }
         </>
     );
