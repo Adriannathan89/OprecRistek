@@ -8,17 +8,20 @@ export class UserAnswer {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
-    sectionId: string;
-
-    @Column()
-    questionId: string;
-
     @Column({type: "json", nullable: true})
     userAnswer: string | string[] | number | boolean;
 
+    @Column({nullable: true})
+    answerId: string | string[];
+
     @Column({name : "user_taking_form_id"})
     userTakingFormId: string;
+
+    @Column({name : "question_id"})
+    questionId: string;
+
+    @Column({name : "section_id"})
+    sectionId: string;
 
     @ManyToOne(() => Section, section => section.userAnswers, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "section_id" })
@@ -28,7 +31,7 @@ export class UserAnswer {
     @JoinColumn({ name: "user_taking_form_id" })
     userTakingForm: UserTakingForm;
 
-    @OneToOne(() => Question, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Question)
     @JoinColumn({ name: "question_id" })
     question: Question;
 }

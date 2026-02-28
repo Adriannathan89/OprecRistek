@@ -24,4 +24,7 @@ export class UserTakingForm {
     @ManyToOne(() => Form, form => form.userTakingForms, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "form_id" })
     form: Form;
+
+    @OneToMany(() => UserAnswer, userAnswer => userAnswer.userTakingForm)
+    userAnswer: UserAnswer[];
 }

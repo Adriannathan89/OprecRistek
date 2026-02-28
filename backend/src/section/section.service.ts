@@ -79,14 +79,9 @@ export class SectionService {
         return apiResponse;
     }
 
-    async getSectionForResponder(id: string) {
-        if(!await this.validateFormPublicationStatus(id)) {
-            const apiResponse = new ApiResponse<Section>(false, 403, "This form is not published yet");
-            return apiResponse;
-        }
-        
+    async getSectionForResponder(id: string, user: any) {
         const section = await this.sectionRepository.findOne({
-            where: { id },
+            where: { id, userId: user.sub },
             relations: ["questions"],
             order: {
                 questions: {
@@ -109,6 +104,7 @@ export class SectionService {
             questionResponse.questionType = question.questionType;
             questionResponse.description = question.description;
             questionResponse.options = question.options;
+            questionResponse.required = question.required;
             return questionResponse;
         });
 

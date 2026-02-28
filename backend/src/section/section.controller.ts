@@ -20,8 +20,8 @@ export class SectionController {
 
     @UseGuards(JwtAuthGuard)
     @Get("/responder/:id")
-    async getSectionForResponder(@Param("id") id: string) {
-        return await this.sectionService.getSectionForResponder(id);
+    async getSectionForResponder(@Param("id") id: string, @Request() req) {
+        return await this.sectionService.getSectionForResponder(id, req.user);
     }
 
     @UseGuards(JwtAuthGuard)

@@ -26,7 +26,7 @@ export class UserTakingFormManagerService {
 
         try {
             const res = await queryRunner.query(`
-                INSERT INTO user_answer (id, questionId, userAnswer, user_taking_form_id, sectionId)
+                INSERT INTO user_answer (id, question_id, userAnswer, user_taking_form_id, section_id)
                 SELECT UUID(), q.id, NULL, '${usertakingFormId}', q.section_id
                 FROM question q
                 WHERE q.section_id IN (
@@ -36,6 +36,7 @@ export class UserTakingFormManagerService {
 
             await queryRunner.commitTransaction();
         } catch (error) {
+            console.log(error);
             await queryRunner.rollbackTransaction();
             throw error;
         } finally {

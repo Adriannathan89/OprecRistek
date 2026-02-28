@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "ty
 import { Form } from "../form/form.entity";
 import { UserTakingForm } from "src/user-taking-form/user-taking-form.entity";
 import { Section } from "src/section/section.entity";
+import { FormResponse } from "src/form-response/form-response.entity";
 
 @Entity()
 export class User {
@@ -25,4 +26,7 @@ export class User {
 
     @OneToMany(() => UserTakingForm, userTakingForm => userTakingForm.user, { cascade: true })
     userTakingForms: UserTakingForm[];
+
+    @OneToMany(() => FormResponse, formResponse => formResponse.user, { cascade: true })
+    formResponses: FormResponse[];
 }

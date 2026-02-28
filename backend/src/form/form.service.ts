@@ -129,8 +129,10 @@ export class FormService {
         const newResponse = new FormResponderResponse();
         newResponse.id = form.id;
         newResponse.title = form.title;
+        newResponse.description = form.description;
         newResponse.isQuiz = form.isQuiz;
         newResponse.sectionsId = form.sections.map(section => section.id);
+        
         const apiReponse = new ApiResponse<FormResponderResponse>(true, 200, "Form found", newResponse);
         return apiReponse;
     }
