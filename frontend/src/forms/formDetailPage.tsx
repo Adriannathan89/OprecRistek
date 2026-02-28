@@ -5,6 +5,7 @@ import { useDetailFormService, useFormAutoSave } from "./hooks/useDetailFormServ
 import FormNavbar from "../components/common/formNavbar";
 import type { QuestionActiveComponent, SectionActiveComponent } from "./service/form-component.type";
 import SectionArea from "../section/sectionArea";
+import { Toaster } from "../components/ui/toaster";
 
 export default function FormDetailPage() {
     const formId = window.location.pathname.split("/form/")[1];
@@ -61,7 +62,8 @@ export default function FormDetailPage() {
 
     return (
         <>
-            <FormHeader isLogin={true} sync={sync} />
+            <Toaster />
+            <FormHeader form={form} isLogin={true} sync={sync} onChange={onChange}/>
             <div className="flex w-full min-h-screen h-auto bg-gray-200 justify-center gap-[40px]">
                 <div className="w-[700px] mt-[40px]">
                     <div className="w-full min-h-[200px] h-auto border-1 border-gray-200 shadow-md bg-white rounded-lg p-4 m-4 
@@ -110,7 +112,7 @@ export default function FormDetailPage() {
                                 onQuestionChange={onQuestionChange}
                                 setQuestionActive={setQuestionActive}
                                 onClick={() => {
-                                    setQuestionActive({sectionId: section.id, questionIndex: 0})
+                                    setQuestionActive({sectionId: section.id, questionIndex: section.questions && section.questions.length > 0 ? 0 : -1})
                                     setSectionActive({ sectionIndex: index })}}
                                 onChange={(section) => onSectionChange(section)}
                                 setSync={setSync}

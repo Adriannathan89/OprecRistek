@@ -1,28 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import UserProfieElement from "../elements/userProfileElement";
 import { Button } from "../ui/button";
-import type { Form } from "../../forms/service/form-component.type";
-import { toast } from "../../hooks/use-toast";
 
-export default function Header({form, isLogin, sync, onChange}: {form: Form, isLogin: boolean, sync: boolean, onChange: (form: Form) => void}) {
+export default function FormAnswerHeader({isLogin, sync}: {isLogin: boolean, sync: boolean}) {
     const navigate = useNavigate()
-    const handlePublish = () => {
-        onChange({...form, isPublished: !form.isPublished})
-        if(!form.isPublished)
-        toast({
-            title: "Form Published",
-            description: `Your form has been published successfully.\n
-            link: localhost:5173/form/${form.id}/answer`,
-            duration: 3000,
-        })
-        else {
-            toast({
-                title: "Form Unpublished",
-                description: `Your form has been unpublished successfully.`,
-                duration: 3000,
-            })
-        }
-    }
 
     return(
         <div className="flex justify-between border-b-2 border-gray-300 py-4 shadow-md]">
@@ -33,9 +14,6 @@ export default function Header({form, isLogin, sync, onChange}: {form: Form, isL
             </div>
             
             <div className="flex gap-[20px] mr-6">
-                <Button 
-                className="bg-blue-500 hover:bg-blue-600" 
-                onClick={() => handlePublish()}>{form.isPublished ? "Unpublish" : "Publish"}</Button>
                 {isLogin ? (
                     <UserProfieElement userId={String(localStorage.getItem("userId"))} />
                 ) : (
