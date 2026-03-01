@@ -10,6 +10,7 @@ import QuestionAnswerEditor from "./questionAnswerEditor";
 interface QuestionAreaProps {
     question: Question;
     isActive: boolean;
+    disabled: boolean;
     onQuestionChange: (question: Question) => void;
     onClick: () => void;
     setSync: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,7 +18,7 @@ interface QuestionAreaProps {
 }
 
 
-export default function QuestionArea({ question, isActive, onQuestionChange, onClick, setSync, onQuestionDelete }: QuestionAreaProps) {
+export default function QuestionArea({ question, isActive, disabled, onQuestionChange, onClick, setSync, onQuestionDelete }: QuestionAreaProps) {
     useQuestionAutoSave(question, setSync);
 
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -53,6 +54,7 @@ export default function QuestionArea({ question, isActive, onQuestionChange, onC
                             ref={descriptionRef}
                             className="h-[30px] resize-none overflow-hidden break-words whitespace-pre-wrap focus:outline-none peer border-b-2 border-gray-200"
                             placeholder="Form Description"
+                            disabled={disabled}
                             value={question.description}
                             onChange={(e) => onQuestionChange({ ...question, description: e.target.value })}
                         />
@@ -60,7 +62,7 @@ export default function QuestionArea({ question, isActive, onQuestionChange, onC
                             className="pointer-events-none absolute bottom-[5px] left-0 h-0.5 w-full bg-[#6775f0] scale-x-0 origin-center
                                     transition-all duration-300 ease-out peer-focus:scale-x-100" />
                     </div>
-                    {isActive && 
+                    {isActive && !disabled &&
                     <select
                         className="outline-none focus:outline-none"
                         value={question.questionType}
@@ -74,10 +76,10 @@ export default function QuestionArea({ question, isActive, onQuestionChange, onC
                     }
                     </div>
                     {!editAnswerMode ?
-                        <QuestionEditor question={question} isActive={isActive} onChange={onQuestionChange} /> :
-                        <QuestionAnswerEditor question={question} isActive={isActive} onChange={onQuestionChange} />
+                        <QuestionEditor disabled={disabled} question={question} isActive={isActive} onChange={onQuestionChange} /> :
+                        <QuestionAnswerEditor disabled={disabled} question={question} isActive={isActive} onChange={onQuestionChange} />
                     }
-                    {isActive && <FooterQuestionCard 
+                    {isActive && !disabled && <FooterQuestionCard 
                     question={question} 
                     onQuestionDelete={onQuestionDelete} 
                     onQuestionChange={onQuestionChange}

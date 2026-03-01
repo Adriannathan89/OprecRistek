@@ -3,17 +3,17 @@ import ShortAnswer, { type QuestionMakerProp } from "../components/card/question
 import CheckBoxAnswer from "../components/card/questionComponent/editQuestion/checkboxAnswer";
 import DropdownAnswer from "../components/card/questionComponent/editQuestion/dropdown";
 
-export default function questionEditor({ question, isActive, onChange } : QuestionMakerProp) {
+export default function questionEditor({ question, isActive, disabled, onChange } : QuestionMakerProp) {
     const renderQuestionType = (type: string) => {
         switch(type) {
             case "multiple-choice":
-                return <MultipleChoiceAnswer question={question} isActive={isActive} onChange={onChange} />
+                return <MultipleChoiceAnswer question={question} isActive={isActive} disabled={disabled} onChange={onChange} />
             case "short-answer":
                 return <ShortAnswer />
             case "check-box":
-                return <CheckBoxAnswer question={question} isActive={isActive} onChange={onChange} />
+                return <CheckBoxAnswer question={question} isActive={isActive} onChange={onChange} disabled={disabled} />
             case "dropdown":
-                return <DropdownAnswer question={question} isActive={isActive} onChange={onChange} />
+                return <DropdownAnswer question={question} isActive={isActive} onChange={onChange} disabled={disabled} />
              default:
                 return null;
         }

@@ -1,6 +1,6 @@
 import type { Answer, Question } from "../../../../forms/service/form-component.type";
 
-export default function EditAnswerCheckbox({question, isActive, onChange} : {question: Question, isActive: boolean, onChange: (question: Question) => void}) {
+export default function EditAnswerCheckbox({question, isActive, disabled, onChange} : {question: Question, isActive: boolean, disabled: boolean, onChange: (question: Question) => void}) {
     const answers: Answer[] = question.answers || [];
 
     return(
@@ -10,11 +10,11 @@ export default function EditAnswerCheckbox({question, isActive, onChange} : {que
                 key={index} 
                 className={"flex gap-3 mb-[20px]" + (answer.isActive ? " bg-green-100 p-2 rounded" : "")}
                 onClick={() => {
-                    if(!isActive) return
+                    if(!isActive || disabled) return
                     onChange({...question, answers: answers.map((ans) => ans.id === answer.id ? {...ans, isActive: !ans.isActive} : ans)})}
                 }
                 >
-                    <input className={"w-[24px] h-[24px]" + (answer.isActive ? "mt-[8px]" : "mt-[12px]")} type="checkbox" checked={answer.isActive}/>
+                    <input className={"w-[24px] h-[24px]" + (answer.isActive ? "mt-[8px]" : "mt-[12px]")} type="checkbox" checked={answer.isActive} disabled={disabled}/>
                     <p className={"flex text-gray-600" + (answer.isActive ? "mt-[8px]" : "mt-[12px]")} >{answer.description}</p>
                 </div>
             ))}

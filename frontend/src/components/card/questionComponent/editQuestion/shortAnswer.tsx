@@ -3,6 +3,7 @@ import type { Question } from "../../../../forms/service/form-component.type";
 export interface QuestionMakerProp {
     question: Question
     isActive: boolean;
+    disabled: boolean;
     onChange: (question: Question) => void;
 }
 

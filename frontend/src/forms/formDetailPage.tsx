@@ -73,6 +73,7 @@ export default function FormDetailPage() {
                                 ref={formTitleref}
                                 className="resize-none text-xl overflow-hidden break-words whitespace-pre-wrap focus:outline-none peer border-b-2 border-gray-200"
                                 placeholder="untitled Form"
+                                disabled={form.isAnswered}
                                 value={form.title}
                                 onChange={(e) => onChange({ ...form, title: e.target.value })}
                             />
@@ -86,6 +87,7 @@ export default function FormDetailPage() {
                                 ref={descriptionRef}
                                 className="min-h-[30px] resize-none text-sm overflow-hidden break-words whitespace-pre-wrap focus:outline-none peer border-b-2 border-gray-200"
                                 placeholder="Form Description"
+                                disabled={form.isAnswered}
                                 value={form.description}
                                 onChange={(e) => onChange({ ...form, description: e.target.value })}
                             />
@@ -106,6 +108,7 @@ export default function FormDetailPage() {
                                 sectionActiveComponent={sectionActive}
                                 questionActive={questionActive}
                                 indexSection={index}
+                                disabled={form.isAnswered}
                                 totalSection={form.sections ? form.sections.length : 0}
                                 onQuestionDelete={onDeleteCurrentQuestion}
                                 onSectionDelete={onDeleteCurrentSection}
@@ -121,7 +124,9 @@ export default function FormDetailPage() {
                         </div>
                     ))}
                 </div>
-                <FormNavbar onAddQuestion={() => {
+                <FormNavbar 
+                disabled={form.isAnswered}
+                onAddQuestion={() => {
                     onAddAfterQuestion(form.sections[sectionActive.sectionIndex].id, questionActive.questionIndex)
                     setQuestionActive({sectionId: questionActive.sectionId, questionIndex: questionActive.questionIndex + 1})
                 }}
