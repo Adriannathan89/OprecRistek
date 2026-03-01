@@ -11,10 +11,7 @@ export default function FormAnswerPage() {
         sectionPosition: string;
     }>();
     const [syncing, setSyncing] = useState(false);
-
     const sectionIndex = Number(sectionPosition) - 1;
-
-    
 
     const { formResponder, userTakingForm, isLoading, error, onUpdateUserAnswer, setIsLoading, setError } = useFormAnswerService(String(formId))
 
@@ -76,7 +73,11 @@ export default function FormAnswerPage() {
                     ))}
                 </div>
                 <div className="mb-[20px]">
-                <NavigationAnswer formId={String(formId)} currIndex={sectionIndex + 1} isFinished={sectionIndex === (formResponder.sectionsId?.length || 0) - 1} />
+                <NavigationAnswer 
+                formId={String(formId)} 
+                currIndex={sectionIndex + 1} 
+                userTakingFormId={userTakingForm.id}
+                isFinished={sectionIndex === (formResponder.sectionsId?.length || 0) - 1}  />
                 </div>
             </div>
         </>

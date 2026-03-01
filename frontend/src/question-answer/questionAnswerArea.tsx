@@ -4,7 +4,7 @@ import { useUpdateUserAnswer } from "../formAnswer/useFormAnswerService";
 interface QuestionAnswerAreaProps {
     question: QuestionResponder;
     userTakingForm: UserTakingForm;
-    onChange: (answer: string | string[] | number | boolean, answerId: string) => void;
+    onChange: (answer: string | string[] | number | boolean, answerId: string | string[]) => void;
     setSyncing: React.Dispatch<React.SetStateAction<boolean>>;
     setError: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -14,7 +14,7 @@ export default function QuestionAnswerArea({ question, userTakingForm, onChange,
     const answerDetail: UserAnswer = userTakingForm.userAnswers?.find(ans => ans.questionId === question.id) as UserAnswer;
     const userAnswer = answerDetail?.userAnswer
 
-    useUpdateUserAnswer({answerDetail, setSyncing, setError});
+    useUpdateUserAnswer({ answerDetail, setSyncing, setError });
 
     const multipleChoiceComponent = (
         <div className="px-2 py-8">
@@ -38,10 +38,24 @@ export default function QuestionAnswerArea({ question, userTakingForm, onChange,
                         className="w-[16px] h-[16px]"
                         name={question.id}
                         value={option.description}
-                        checked={Array.isArray(userAnswer) && userAnswer.includes(option.description)} onChange={(e) => {
-                            const checked = e.target.checked;
-                            onChange(checked ? [...(Array.isArray(userAnswer) ? userAnswer : []), option.description] : (Array.isArray(userAnswer) ? userAnswer.filter((opt) => opt !== option.description) : []), option.id);
+                        checked={Array.isArray(userAnswer) && userAnswer.includes(option.description)}
+                        onChange={(checked) => {
+                            const currentAnswers = Array.isArray(userAnswer) ? userAnswer : [];
+                            const currentIds = Array.isArray(answerDetail?.answerId)
+                                ? answerDetail.answerId
+                                : [];
+
+                            const newAnswers = checked && !currentAnswers.includes(option.description)
+                                ? [...currentAnswers, option.description]
+                                : currentAnswers.filter((opt) => opt !== option.description);
+
+                            const newIds = checked && !currentIds.includes(option.id)
+                                ? [...currentIds, option.id]
+                                : currentIds.filter((id) => id !== option.id);
+
+                            onChange(newAnswers, newIds);
                         }} />
+
                     <p className="ml-2">{option.description}</p>
                 </div>
             ))}
@@ -50,15 +64,15 @@ export default function QuestionAnswerArea({ question, userTakingForm, onChange,
 
     const dropdownComponent = (
         <div className="px-2 py-8">
-        <select 
-        className="w-[400px] p-2 border border-gray-300 rounded-md"
-        value={userAnswer as string || "select an option"} 
-        onChange={(e) => onChange(e.target.value, e.target.options[e.target.selectedIndex].dataset.id || "")}>
-            <option value="select an option">Select an option</option>
-            {options.map((option) => (
-                <option key={option.id} value={option.description} data-id={option.id}>{option.description}</option>
-            ))}
-        </select>
+            <select
+                className="w-[400px] p-2 border border-gray-300 rounded-md"
+                value={userAnswer as string || "select an option"}
+                onChange={(e) => onChange(e.target.value, e.target.options[e.target.selectedIndex].dataset.id || "")}>
+                <option value="select an option">Select an option</option>
+                {options.map((option) => (
+                    <option key={option.id} value={option.description} data-id={option.id}>{option.description}</option>
+                ))}
+            </select>
         </div>
     )
 

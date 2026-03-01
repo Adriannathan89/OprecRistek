@@ -58,8 +58,7 @@ export async function getSectionResponder(sectionId: string) {
 }
 
 
-export async function updateUserAnswerDetail(userAnswerId: string, answerId: string, answer: any) {
-    console.log({ userAnswerId, answerId, answer })
+export async function updateUserAnswerDetail(userAnswerId: string, answerId: string | string[], answer: any) {
     const res = await fetch(`${import.meta.env.VITE_SAVE_ANSWER_ENDPOINT}/${userAnswerId}`, {
         method: 'PUT',
         headers: {

@@ -41,7 +41,7 @@ export function useFormAnswerService(formId: string) {
 
     }, [formId])
 
-    const onUpdateUserAnswer = (userAnswerId: string, questionId: string, sectionId: string, answer: string | string[] | number | boolean, answerId: string) => {
+    const onUpdateUserAnswer = (userAnswerId: string, questionId: string, sectionId: string, answer: string | string[] | number | boolean, answerId: string | string[]) => {
         setUserTakingForm((prev) => {
             if (!prev) return prev;
             const updatedAnswers = prev.userAnswers.map((ans) => {
@@ -87,9 +87,8 @@ interface UpdateUserAnswerParams {
 }
 
 export async function useUpdateUserAnswer({answerDetail, setSyncing, setError}: UpdateUserAnswerParams) {
-    if(!answerDetail || answerDetail.userAnswer === undefined || answerDetail.answerId === undefined) return;
-
-
+    if(!answerDetail || !answerDetail.id) return;
+    
     useEffect(() => {
         const timeOut = setTimeout(() => {
             setSyncing(true);
@@ -104,5 +103,5 @@ export async function useUpdateUserAnswer({answerDetail, setSyncing, setError}: 
         return () => {
             clearTimeout(timeOut);
         }
-    }, [answerDetail.answerId, answerDetail.userAnswer])
+    }, [answerDetail.answerId, answerDetail.userAnswer, answerDetail.id])
 }

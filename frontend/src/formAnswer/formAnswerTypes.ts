@@ -3,7 +3,7 @@ import type { Option } from "../forms/service/form-component.type"
 export type UserAnswer = {
     id: string
     userAnswer: string | string[] | number | boolean,
-    answerId: string,
+    answerId: string  | string[],
     userTakingFormId: string,
     questionId: string,
     sectionId: string,
