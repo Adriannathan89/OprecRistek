@@ -4,6 +4,9 @@ import { Section } from "./section.entity";
 import { SectionDto } from "./section.dto";
 import { ApiResponse } from "src/apiResponse/api.response";
 import { Repository } from "typeorm";
+import { Form } from "src/form/form.entity";
+import { SectionResponderResponse } from "./section-responder.response";
+import { QuestionRespondenResponse } from "src/question/response/question-responden.response";
 
 @Injectable()
 export class SectionService {
@@ -11,25 +14,51 @@ export class SectionService {
         @InjectRepository(Section) private sectionRepository: Repository<Section>,
     ) { }
 
-    async createSection(sectionDto: SectionDto) {
+    validateSectionOwnership(sectionId: string, userId: string): Promise<boolean> {
+        return this.sectionRepository.manager
+            .createQueryBuilder(Section, "section")
+            .andWhere("section.id = :sectionId", { sectionId })
+            .andWhere("section.userId = :userId", { userId })
+            .getCount()
+            .then(count => count > 0);
+    }
+
+    validateFormPublicationStatus(formId: string): Promise<boolean> {
+        return this.sectionRepository.manager
+            .createQueryBuilder(Form, "form")
+            .andWhere("form.id = :formId", { formId })
+            .andWhere("form.isPublished = true")
+            .getCount()
+            .then(count => count > 0);
+    }
+
+    async createSection(sectionDto: SectionDto, user: any) {
         try {
             const sectionData = new Section();
             Object.assign(sectionData, sectionDto);
+            sectionData.userId = user.sub;
             const section = await this.sectionRepository.save(sectionData);
-            return new ApiResponse<Section>(true, 201, "Section created successfully");
+            return new ApiResponse<Section>(true, 201, "Section created successfully", section);
         } catch (error) {
             const apiResponse = new ApiResponse<Section>(false, 500, "Failed to create section");
             return apiResponse;
         }
     }
 
-    async updateSection(id: string, sectionDto: SectionDto) {
+    async updateSection(id: string, sectionDto: SectionDto, user: any
+    ) {
         try {
             const section = await this.sectionRepository.findOne({ where: { id } });
-            if (!section) {
+            if(!section) {
                 const apiResponse = new ApiResponse<Section>(false, 404, "Section not found");
                 return apiResponse;
             }
+
+            if(!await this.validateSectionOwnership(id, user.sub)) {
+                const apiResponse = new ApiResponse<Section>(false, 403, "You do not have permission to update this section");
+                return apiResponse;
+            }
+            
             Object.assign(section, sectionDto);
             const updatedSection = await this.sectionRepository.save(section);
             return new ApiResponse<Section>(true, 200, "Section updated successfully", updatedSection);
@@ -39,23 +68,47 @@ export class SectionService {
         }
     }
 
-    async deleteSection(id: string) {
-        const deleteResult = await this.sectionRepository.delete(id);
-        if (deleteResult.affected === 0) {
-            const apiResponse = new ApiResponse<Section>(false, 404, "Section not found");
+    async deleteSection(id: string, user: any) {
+        if(!await this.validateSectionOwnership(id, user.sub)) {
+            const apiResponse = new ApiResponse<Section>(false, 403, "You do not have permission to delete this section");
             return apiResponse;
         }
+
+        const deleteResult = await this.sectionRepository.delete(id);
         const apiResponse = new ApiResponse<Section>(true, 200, "Section deleted successfully");
         return apiResponse;
     }
 
-    async getSectionByFormId(formId: string) {
-        const sections = await this.sectionRepository.find({ where: { formId } });
-        if (!sections || sections.length === 0) {
-            const apiResponse = new ApiResponse<Section[]>(false, 404, "No sections found for this form");
+    async getSectionForResponder(id: string, user: any) {
+        const section = await this.sectionRepository.findOne({
+            where: { id, userId: user.sub },
+            relations: ["questions"],
+            order: {
+                questions: {
+                    position: "ASC"
+                }
+            }
+        });
+
+        if (!section) {
+            const apiResponse = new ApiResponse<Section>(false, 404, "Section not found");
             return apiResponse;
         }
-        const apiResponse = new ApiResponse<Section[]>(true, 200, "Sections retrieved successfully", sections);
+        const sectionResponse = new SectionResponderResponse();
+        sectionResponse.id = section.id;
+        sectionResponse.title = section.title;
+        sectionResponse.description = section.description;
+        sectionResponse.questions = section.questions.map(question => {
+            const questionResponse = new QuestionRespondenResponse();
+            questionResponse.id = question.id;
+            questionResponse.questionType = question.questionType;
+            questionResponse.description = question.description;
+            questionResponse.options = question.options;
+            questionResponse.required = question.required;
+            return questionResponse;
+        });
+
+        const apiResponse = new ApiResponse<SectionResponderResponse>(true, 200, "Section found", sectionResponse);
         return apiResponse;
     }
 }

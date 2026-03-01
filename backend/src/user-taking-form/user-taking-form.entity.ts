@@ -1,8 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, Unique } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Form } from '../form/form.entity';
-import { UserAnswer } from 'src/user-answer/user-aswer.entity';
+import { UserAnswer } from 'src/user-answer/user-answer.entity';
+import { FormResponse } from 'src/form-response/form-response.entity';
 
+@Unique(["userId", "formId"])
 @Entity()
 export class UserTakingForm {
     @PrimaryGeneratedColumn("uuid")
@@ -24,4 +26,7 @@ export class UserTakingForm {
     @ManyToOne(() => Form, form => form.userTakingForms, { onDelete: 'CASCADE' })
     @JoinColumn({ name: "form_id" })
     form: Form;
+
+    @OneToMany(() => FormResponse, formResponse => formResponse.userTakingForm)
+    formResponses: FormResponse[];
 }

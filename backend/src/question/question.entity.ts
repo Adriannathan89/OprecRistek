@@ -12,11 +12,14 @@ export class Question {
     @Column({nullable: true})
     description: string;
 
-    @Column()
+    @Column({type: "varchar", default: "multiple-choice"})
     questionType: string;
 
     @Column({type: "boolean", default: false})
     required: boolean;
+
+    @Column()
+    position: number;
 
     @Column({name : "section_id"})
     sectionId: string;
