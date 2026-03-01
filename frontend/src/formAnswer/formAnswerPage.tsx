@@ -23,13 +23,13 @@ export default function FormAnswerPage() {
         setIsLoading,
         setError
     )
+
+     if (error && error.statusCode !== 404) {
+        return <div>Error: {error.message}</div>
+    }
     
     if(!userTakingForm || !formResponder) {
         return <div>Loading...</div>
-    }
-
-    if (error && error.statusCode !== 404) {
-        return <div>Error: {error.message}</div>
     }
 
     if (isLoading) {

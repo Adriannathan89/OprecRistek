@@ -6,7 +6,6 @@ import Header from "../components/common/header";
 export default function FormResponsePage() {
     const { formId, userTakingFormId } = useParams<{ formId: string, userTakingFormId: string }>();
     const { formResponse, questions, userAnswersResponse, title } = useFormResponseService(String(formId), String(userTakingFormId));
-    console.log("Form Response:", formResponse);
 
     return (
         <>
