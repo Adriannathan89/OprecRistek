@@ -1,4 +1,4 @@
-export default function EditAnswerShortAnswer({ question, isActive, onChange }: { question: any, isActive: boolean, onChange: (question: any) => void }) {
+export default function EditAnswerShortAnswer({ question, isActive, disabled, onChange }: { question: any, isActive: boolean, disabled: boolean, onChange: (question: any) => void }) {
     const answers = question.answers || [];
 
     return(
@@ -6,8 +6,10 @@ export default function EditAnswerShortAnswer({ question, isActive, onChange }: 
             {
                 answers.map((answer: any, index: number) => (
                     <div key={index} className={"flex gap-3 mb-[20px]"}>
-                        <input className="w-[400px] text-gray-500 h-[40px] focus:outline-none outline-none border-b-2 border-gray-200 rounded px-2 py-1" 
+                        <input className="w-[400px] text-gray-500 h-[40px] focus:outline-none outline-none border-b-2 border-gray-200 rounded 
+                        px-2 py-1 disabled:bg-transparent disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed" 
                         type="text" 
+                        disabled={disabled}
                         value={answer.description} 
                         onChange={(e) => {
                             onChange({
@@ -26,7 +28,7 @@ export default function EditAnswerShortAnswer({ question, isActive, onChange }: 
             <div
             className="px-2 flex gap-2 mt-[8px] text-sm text-gray-400 cursor-pointer border-b-2 border-gray-200 w-[150px]"
             onClick={() => {
-                if(!isActive) return
+                if(!isActive || disabled) return
                 onChange({...question, answers: [...answers, {id: crypto.randomUUID(), description: "Correct Answer", isActive: true}]})
             }}
             >

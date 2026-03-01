@@ -65,13 +65,20 @@ export class FormResponseService {
         try {
             const formResponse = new FormResponse();
             const { totalScore, fullScore } = await this.gradeFormResponse(dto.userTakingFormId, dto.formId);
+            const form = await this.formResponseRepository.manager.findOne(Form, { where: { id: dto.formId } });
 
+            if (!form) {
+                throw new NotFoundResponse("Form not found");
+            }
+
+            form.isAnswered = true;
             formResponse.formId = dto.formId;
             formResponse.userTakingFormId = dto.userTakingFormId;
             formResponse.userId = user.sub;
             formResponse.score = totalScore;
             formResponse.fullScore = fullScore;
 
+            await this.formResponseRepository.manager.save(form);
             await this.formResponseRepository.save(formResponse);
 
             const formResponseWithScore = await this.formResponseRepository
@@ -98,13 +105,22 @@ export class FormResponseService {
 
 
     async getFormResponseByUser(user: any) {
-        const formResponses = await this.formResponseRepository.find({ where: { userId: user.sub } });
+         const formResponse = await this.formResponseRepository
+                .createQueryBuilder("formResponse")
+                .leftJoinAndSelect("formResponse.form", "form")
+                .leftJoinAndSelect("formResponse.userTakingForm", "userTakingForm")
+                .leftJoinAndSelect("userTakingForm.userAnswers", "userAnswers")
+                .leftJoinAndSelect("userAnswers.question", "question")
+                .where("formResponse.userId = :id", { id: user.sub })
+                .orderBy("question.position", "ASC")
+                .getMany();
 
-        if (!formResponses || formResponses.length === 0) {
+
+        if (!formResponse || formResponse.length === 0) {
             throw new NotFoundResponse("No response found for this user")
         }
 
-        const apiResponse = new ApiResponse<FormResponse[]>(true, 200, "Form responses retrieved successfully", formResponses);
+        const apiResponse = new ApiResponse<FormResponse[]>(true, 200, "Form responses retrieved successfully", formResponse);
         return apiResponse;
     }
 }  

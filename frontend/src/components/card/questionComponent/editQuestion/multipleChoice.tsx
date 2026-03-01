@@ -2,7 +2,7 @@ import type { Answer, Option, Question } from "../../../../forms/service/form-co
 import UseEditQuestionProps from "../../../../question/useEditQuestionProps";
 
 
-export default function MultipleChoiceAnswer({question, isActive, onChange} : {question: Question, isActive: boolean, onChange: (question: Question) => void}) {
+export default function MultipleChoiceAnswer({question, isActive, disabled, onChange} : {question: Question, isActive: boolean, disabled: boolean, onChange: (question: Question) => void}) {
     const options: Option[] = question.options || [];
     const answers: Answer[] = question.answers || [];
     const { updateOptionAndAnswer, addNew, deleteOptions } = UseEditQuestionProps(question, onChange);
@@ -15,25 +15,26 @@ export default function MultipleChoiceAnswer({question, isActive, onChange} : {q
                     <input disabled className="w-[24px] h-[24px] mt-[12px]" type="radio"/>
                     <input 
                         type="text"
+                        disabled={disabled}
                         value={option.description}
                         onChange={(e) => {
                             updateOptionAndAnswer(options, answers, option.id, e.target.value)
                         }}
                         className="p-2 border-b-2 border-gray-200 w-[600px] focus:outline-none outline-none peer
-                        text-gray-600 "
+                        text-gray-600 disabled:bg-transparent disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
                     />
                     <span
                     className="w-[599px] pointer-events-none absolute bottom-[0px] left-9 h-0.5 w-full bg-[#6775f0] scale-x-0 origin-center
                         transition-all duration-300 ease-out peer-focus:scale-x-100" />
-                    {isActive &&
-                    <button className="absolute bottom-2 right-5 text-xl text-gray-400" 
+                    {isActive && disabled &&
+                    <button disabled={disabled} className="absolute bottom-2 right-5 text-xl text-gray-400" 
                     onClick={() => deleteOptions(option.id)}>x</button>}
                     </div>
                 </div>
             ))}
             <div className="flex gap-2 mt-[8px]">
-                <input disabled className="w-[24px] h-[24px]" type="radio"/>
-                <button className="cursor-pointer w-[72px] border-b-2 border-gray-200 text-xs px-[4px] text-gray-400" 
+                <input disabled={disabled} className="w-[24px] h-[24px]" type="radio"/>
+                <button disabled={disabled} className="cursor-pointer w-[72px] border-b-2 border-gray-200 text-xs px-[4px] text-gray-400" 
                 onClick={() => addNew(options, answers)}>Add Option</button>
             </div>
         </div>

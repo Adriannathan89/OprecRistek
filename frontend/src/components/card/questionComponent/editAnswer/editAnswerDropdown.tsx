@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Answer, Question } from "../../../../forms/service/form-component.type";
 
-export default function EditAnswerDropdown({ question, isActive, onChange }: { question: Question, isActive: boolean, onChange: (question: Question) => void }) {
+export default function EditAnswerDropdown({ question, isActive, disabled, onChange }: { question: Question, isActive: boolean, disabled: boolean, onChange: (question: Question) => void }) {
     const answers: Answer[] = question.answers || [];
     const [oldId, setOldId] = useState<string>("")
 
@@ -16,7 +16,7 @@ export default function EditAnswerDropdown({ question, isActive, onChange }: { q
                     key={index}
                     className={"flex gap-3 mb-[20px]" + (answer.isActive ? " bg-green-100 p-2 rounded" : "")}
                     onClick={() => {
-                        if (!isActive) return
+                        if (!isActive || disabled) return
                         onChange({
                             ...question, answers: answers.map((ans) => {
                                 if (ans.id === answer.id) {

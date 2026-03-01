@@ -12,6 +12,7 @@ interface SetionAreaProps {
     questionActive: QuestionActiveComponent;
     indexSection: number;
     totalSection: number;
+    disabled: boolean;
     setQuestionActive: React.Dispatch<React.SetStateAction<QuestionActiveComponent>>;
     onChange: (section: Section) => void;
     onQuestionChange: (question: Question) => void;
@@ -22,7 +23,7 @@ interface SetionAreaProps {
     setSectionActive: React.Dispatch<React.SetStateAction<SectionActiveComponent>>;
 }
 
-export default function SectionArea({ section, sectionActiveComponent, questionActive, indexSection, totalSection, setQuestionActive, onChange, onQuestionChange,
+export default function SectionArea({ section, sectionActiveComponent, questionActive, indexSection, totalSection, disabled, setQuestionActive, onChange, onQuestionChange,
     onClick, setSync, onSectionDelete, onQuestionDelete, setSectionActive }: SetionAreaProps) {
 
     const sectionTitleref = useRef<HTMLTextAreaElement>(null);
@@ -62,6 +63,7 @@ export default function SectionArea({ section, sectionActiveComponent, questionA
                             ref={sectionTitleref}
                             className="resize-none text-xl overflow-hidden break-words whitespace-pre-wrap focus:outline-none peer border-b-2 border-gray-200"
                             placeholder="untitled Section"
+                            disabled={disabled}
                             value={section.title}
                             onChange={(e: any) => onChange({ ...section, title: e.target.value })}
                         />
@@ -75,6 +77,7 @@ export default function SectionArea({ section, sectionActiveComponent, questionA
                             ref={sectionDescriptionRef}
                             className="min-h-[30px] resize-none text-sm overflow-hidden break-words whitespace-pre-wrap focus:outline-none peer border-b-2 border-gray-200"
                             placeholder="description (Optional)"
+                            disabled={disabled}
                             value={section.description}
                             onChange={(e: any) => onChange({ ...section, description: e.target.value })}
                         />
@@ -84,7 +87,7 @@ export default function SectionArea({ section, sectionActiveComponent, questionA
                     </div>
 
                     <div>
-                        {(sectionActiveComponent.sectionIndex === indexSection && totalSection > 1) &&
+                        {(sectionActiveComponent.sectionIndex === indexSection && totalSection > 1 && !disabled) &&
                             <div className="flex justify-end w-full gap-2 mt-[12px] pr-[32px]">
                                 <button onClick={() => onSectionDelete(section.id)}><Trash size={20} /></button>
                             </div>}
@@ -97,6 +100,7 @@ export default function SectionArea({ section, sectionActiveComponent, questionA
                     <QuestionArea
                         onQuestionDelete={() => onQuestionDelete(section.id, question.id, section.questions ? section.questions.length : 0, index)}
                         key={index}
+                        disabled={disabled}
                         question={question}
                         isActive={questionActive.questionIndex === index && questionActive.sectionId === section.id}
                         onClick={() => {
