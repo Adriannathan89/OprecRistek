@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { type Form, type Question } from "../service/form-component.type";
 import type { AppError } from "../../errorHandling/errorType";
 import { deleteForm, getFormById, updateForm } from "../service/form.service";
 import { useNavigate } from "react-router-dom";
 import { type Section } from "../service/form-component.type";
-import { createSection, rebalanceSection } from "../../section/section.service";
-import { createQuestion, rebalanceQuestion } from "../../question/question.service";
+import { createSection, deleteSection, rebalanceSection } from "../../section/section.service";
+import { createQuestion, deleteQuestion, rebalanceQuestion } from "../../question/question.service";
 import { type QuestionActiveComponent, type SectionActiveComponent } from "../service/form-component.type";
 
 export function useDetailFormService(formId: string, setQuestionActive: React.Dispatch<React.SetStateAction<QuestionActiveComponent>>, 
@@ -14,7 +14,6 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
     const [form, setForm] = useState<Form>({} as Form);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<AppError | null>(null);
-    console.log(form);
 
     const onChange = (form: Form) => {
         setForm(form);
@@ -28,17 +27,17 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
     }
 
     const onAddAfterSection = async (index: number) => {
-        const currPosition = index === form.sections.length || form.sections.length < 2 ?   
+        const currPosition = index === form.sections.length-1 || form.sections.length < 2 ?   
                 index * 1000 + 1000 :
                 (form.sections[index].position + form.sections[index + 1].position) / 2;
 
         const newSectionId = await createSection(form.id, currPosition);
         setSectionActive({ sectionIndex: index + 1 });
 
-        if (form.sections.length >= 2 && form.sections[index + 1].position - form.sections[index].position <= 4 && index != form.sections.length - 1) {
+        const sectionRebalanceActivation = form.sections.length >= 2 && index != form.sections.length - 1 && form.sections[index + 1].position - form.sections[index].position <= 4;
+        if (sectionRebalanceActivation) {
             rebalanceSection(form.id)
         }
-
         setForm((prevForm) => {
             const newSection: Section = {
                 id: newSectionId,
@@ -55,7 +54,7 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
     const onAddAfterQuestion = async (sectionId: string, index: number) => {
         const section = form.sections.find((s) => s.id === sectionId);
         if(!section) return;
-        const currPosition = !section.questions || section.questions.length === index || section.questions?.length < 2?
+        const currPosition = !section.questions || section.questions.length-1 === index || section.questions?.length < 2?
             index * 1000 + 1000 :
             (section.questions[index].position + section.questions[index + 1].position) / 2;
 
@@ -63,7 +62,9 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
         const id = question.id;
         setQuestionActive({ questionIndex: index + 1, sectionId: sectionId });
 
-        if(section.questions && section.questions.length >= 2 && section.questions[index + 1].position - section.questions[index].position <= 4) {
+    
+        const rebalanceQuestionActivation = section.questions && section.questions.length >= 2 && index != section.questions.length-1 && section.questions[index + 1].position - section.questions[index].position <= 4;
+        if(rebalanceQuestionActivation) {
             rebalanceQuestion(sectionId);
         }
 
@@ -87,16 +88,52 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
         });
     }
 
-    const onQuestionChange = (question: Question) => {
+    const onDeleteCurrentSection = async (sectionId: string) => {
+        await deleteSection(sectionId);
         setForm((prevForm) => {
-            const updatedQuestions = prevForm.sections?.flatMap((section) => {
-                if (section.id === question.sectionId) {
-                    return section.questions?.map((q) => q.id === question.id ? question : q) || [];
-                }
-                return section.questions || [];
-            });
-            return { ...prevForm, questions: updatedQuestions };
+            const updatedSections = prevForm.sections?.filter((section) => section.id !== sectionId);
+            return { ...prevForm, sections: updatedSections };
         });
+    }
+
+    const onDeleteCurrentQuestion = async (sectionId: string, questionId: string, questionLength: number, index: number) => {
+        await deleteQuestion(questionId);
+        setForm((prevForm) => {
+            const updatedSections = prevForm.sections?.map((section) => {
+                if (section.id === sectionId) {
+                    const updatedQuestions = section.questions?.filter((question) => question.id !== questionId);
+                    return { ...section, questions: updatedQuestions };
+                }
+                return section;
+            }
+            );
+            return { ...prevForm, sections: updatedSections };
+        }); 
+
+        if(questionLength === index + 1) {
+            setQuestionActive({ questionIndex: index - 1, sectionId: sectionId });
+        }
+    }
+
+    const onQuestionChange = (question: Question) => {
+       setForm((prevForm) => {
+        const updatedSections = prevForm.sections?.map((section) => {
+            if (section.id === question.sectionId) {
+                return {
+                    ...section,
+                    questions: section.questions?.map((q) =>
+                        q.id === question.id ? question : q
+                    )
+                };
+            }
+            return section;
+        });
+
+        return {
+            ...prevForm,
+            sections: updatedSections
+        };
+    });
     }
 
     useEffect(() => {
@@ -117,6 +154,7 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
 
     return {
         form, onChange,
+        onDeleteCurrentQuestion, onDeleteCurrentSection,
         onQuestionChange, onSectionChange,
         onAddAfterQuestion, onAddAfterSection,
         useDeleteForm,
@@ -125,8 +163,12 @@ export function useDetailFormService(formId: string, setQuestionActive: React.Di
 }
 
 export function useFormAutoSave(form: Form, setSync: React.Dispatch<React.SetStateAction<boolean>>) {
-
+    const isFirstRender = useRef(true);
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         const timeOut = setTimeout(() => {
             setSync(true);
             updateForm(form)

@@ -6,7 +6,6 @@ export default function FormsArea() {
     const { forms, isLoading, error, useCreateForm } = useFormService();
 
     if (error && error.statusCode != 404) {
-        console.log(error);
         return <p>error bang</p>
     }
 

@@ -23,10 +23,14 @@ export function useFormService() {
 
     const useCreateForm = async () => {
         setIsLoading(true);
-        createForm()
-            .then((newForm) => setForms((prevForms) => [...prevForms, newForm]))
+        const id = createForm()
+            .then((newForm) => {
+                setForms((prevForms) => [...prevForms, newForm]);
+                return newForm.id;
+            })
             .catch(setError)
-            .finally(() => setIsLoading(false))     
+            .finally(() => setIsLoading(false)) 
+        return id; 
     }
 
     return { forms, isLoading, error, useCreateForm };
