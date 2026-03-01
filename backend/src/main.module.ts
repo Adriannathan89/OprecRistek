@@ -9,6 +9,7 @@ import { UserTakingFormModule } from './user-taking-form/user-taking-form.module
 import { UserAnswerModule } from './user-answer/user-answer.module';
 import { QuestionModule } from './question/question.module';
 import { ConfigModule } from '@nestjs/config';
+import { FormResponseModule } from './form-response/form-response.module';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ dotenv.config();
         SectionModule,
         UserAnswerModule,
         QuestionModule,
+        FormResponseModule,
     ],
 })
 export class MainModule {}

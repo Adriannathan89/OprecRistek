@@ -1,12 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { UnAuthResponse } from "src/apiResponse/errorResponse/unAuth.response";
+import { Question } from "src/question/question.entity";
+import { UserAnswer } from "src/user-answer/user-answer.entity";
 import { DataSource } from "typeorm";
 
 @Injectable()
 export class UserTakingFormManagerService {
     constructor(
         private readonly dataSource: DataSource
-    ) {}
+    ) { }
 
 
     validateAllId(id: string) {
@@ -15,32 +17,31 @@ export class UserTakingFormManagerService {
     }
 
     async createAllBlankUserAnswers(formId: string, userId: string, usertakingFormId: string) {
-        if(!this.validateAllId(formId) || !this.validateAllId(userId) || !this.validateAllId(usertakingFormId)) {
-            throw new UnAuthResponse(400, "Invalid ID format");
-        }
-        
-        const queryRunner = this.dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-
-
         try {
-            const res = await queryRunner.query(`
-                INSERT INTO user_answer (id, question_id, userAnswer, user_taking_form_id, section_id)
-                SELECT UUID(), q.id, NULL, '${usertakingFormId}', q.section_id
-                FROM question q
-                WHERE q.section_id IN (
-                    SELECT id FROM section WHERE form_id = '${formId}'
-                )
-            `);
+            await this.dataSource.transaction(async (manager) => {
 
-            await queryRunner.commitTransaction();
+                const questions = await manager.find(Question, {
+                    where: {
+                        section: {
+                            form: { id: formId }
+                        }
+                    }
+                });
+
+                const userAnswers = questions.map(q =>
+                    manager.create(UserAnswer, {
+                        questionId: q.id,
+                        sectionId: q.sectionId,
+                        userTakingFormId: usertakingFormId,
+                        userAnswer: null
+                    })
+                );
+
+                await manager.insert(UserAnswer, userAnswers);
+
+            });
         } catch (error) {
-            console.log(error);
-            await queryRunner.rollbackTransaction();
             throw error;
-        } finally {
-            await queryRunner.release();
         }
     }
 }

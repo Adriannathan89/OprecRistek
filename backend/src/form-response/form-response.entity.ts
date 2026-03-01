@@ -20,6 +20,9 @@ export class FormResponse {
     @Column()
     score: number;
 
+    @Column()
+    fullScore: number;
+
     @ManyToOne(() => User, {onDelete: 'CASCADE'})
     @JoinColumn({name: "user_id"})
     user: User;

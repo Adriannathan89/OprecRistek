@@ -9,9 +9,9 @@ export class UserAnswer {
     id: string;
 
     @Column({type: "json", nullable: true})
-    userAnswer: string | string[] | number | boolean;
+    userAnswer: string | string[] | number | boolean | null;
 
-    @Column({nullable: true})
+    @Column({type: "json", nullable: true})
     answerId: string | string[];
 
     @Column({name : "user_taking_form_id"})
